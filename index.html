@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Routen | LNV</title>
+
+  <meta name="description" content="Routen Übersicht – Sammler, Labor, Verkäufer, Spots." />
+  <meta name="author" content="LNV" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <style>
+    :root{
+      /* ===== ROYAL GOLD THEME ===== */
+      --gold:#d6b04a;         /* main gold */
+      --gold-soft:#f2dc9a;    /* highlight */
+      --gold-deep:#9a7724;    /* deep gold / bronze edge */
+
+      --royal-blue:#153a78;   /* subtle accent (logo blue vibe) */
+      --royal-blue-soft:#1d4ea0;
+
+      --bg:#070606;           /* deep black */
+      --bg2:#0c0a08;          /* warm black */
+      --card:#12100d;         /* near-black warm */
+      --border:rgba(214,176,74,.26);
+
+      --text:#fff7dd;         /* warm cream */
+      --muted:rgba(255,247,221,.72);
+
+      --shadow: 0 14px 45px rgba(0,0,0,.55);
+    }
+
+    *{margin:0;padding:0;box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      font-family:'Rajdhani',sans-serif;
+      background:
+        radial-gradient(circle at 30% 12%, rgba(214,176,74,.10), transparent 58%),
+        radial-gradient(circle at 75% 18%, rgba(21,58,120,.08), transparent 60%),
+        linear-gradient(180deg, var(--bg), var(--bg2));
+      color:var(--text);
+      line-height:1.6;
+      overflow-x:hidden;
+    }
+    .container{max-width:1200px;margin:0 auto;padding:0 20px}
+
+    /* ===== INTRO ===== */
+    body.intro-active{overflow:hidden}
+    .intro-overlay{
+      position:fixed;inset:0;z-index:9999;
+      display:flex;align-items:center;justify-content:center;
+      opacity:1;visibility:visible;
+      transition:opacity .55s ease,visibility .55s ease;
+      background:
+        radial-gradient(circle at 50% 40%, rgba(214,176,74,.12), transparent 62%),
+        linear-gradient(180deg, #050404, #0b0806);
+    }
+    .intro-overlay.hidden{opacity:0;visibility:hidden;pointer-events:none}
+    .intro-content{
+      position:relative;
+      width:min(600px, 92vw);
+      padding:30px 26px;
+      border-radius:18px;
+      background:rgba(16,13,10,.78);
+      border:1px solid rgba(214,176,74,.28);
+      box-shadow:0 22px 70px rgba(0,0,0,.7);
+      backdrop-filter: blur(10px);
+      text-align:center;
+    }
+    .intro-logo-image{
+      max-width:310px;width:100%;height:auto;
+      display:block;margin:0 auto 14px;
+      filter:drop-shadow(0 0 16px rgba(214,176,74,.20));
+    }
+    .intro-subtitle{
+      letter-spacing:6px;
+      text-transform:uppercase;
+      color:var(--muted);
+      font-size:.95rem;
+    }
+    .intro-divider{
+      width:220px;height:2px;margin:16px auto 18px;
+      background:linear-gradient(90deg, transparent, rgba(214,176,74,.95), transparent);
+      opacity:.9;
+    }
+    .intro-text{
+      letter-spacing:3px;
+      text-transform:uppercase;
+      color:var(--muted);
+      margin-bottom:18px;
+      font-size:.95rem;
+    }
+    .intro-button{
+      border:1px solid rgba(214,176,74,.70);
+      background:linear-gradient(180deg, rgba(214,176,74,.16), rgba(214,176,74,.06));
+      color:var(--text);
+      padding:12px 18px;
+      border-radius:14px;
+      cursor:pointer;
+      font-weight:900;
+      letter-spacing:2px;
+      text-transform:uppercase;
+      display:inline-flex;
+      align-items:center;
+      gap:.7rem;
+      transition:.2s;
+    }
+    .intro-button:hover{
+      transform:translateY(-2px);
+      border-color:rgba(242,220,154,.85);
+      box-shadow:0 10px 34px rgba(214,176,74,.14);
+    }
+    .intro-button svg{opacity:.95}
+
+    /* ===== AUDIO ===== */
+    .audio-player{
+      position:fixed;bottom:18px;right:18px;z-index:1200;
+      background:rgba(16,13,10,.86);
+      border:1px solid rgba(214,176,74,.22);
+      border-radius:14px;
+      padding:10px 12px;
+      opacity:0;visibility:hidden;transform:translateY(10px);
+      transition:.25s;
+      backdrop-filter: blur(10px);
+      box-shadow:0 8px 26px rgba(0,0,0,.55);
+    }
+    .audio-player.visible{opacity:1;visibility:visible;transform:translateY(0)}
+    .audio-player-content{display:flex;align-items:center;gap:12px}
+    .audio-control-btn{
+      width:42px;height:42px;border-radius:50%;
+      border:1px solid rgba(214,176,74,.55);
+      background:linear-gradient(180deg, rgba(214,176,74,.22), rgba(214,176,74,.10));
+      color:var(--text);
+      cursor:pointer;
+      display:flex;align-items:center;justify-content:center;
+      transition:.2s;
+    }
+    .audio-control-btn:hover{transform:scale(1.05)}
+    .audio-title{font-weight:900;letter-spacing:1px;min-width:90px}
+    .volume-slider{width:120px}
+    .volume-icon{opacity:.9}
+
+    /* ===== NAVBAR ===== */
+    .navbar{
+      position:fixed;top:0;left:0;right:0;z-index:1000;
+      background:rgba(10,8,6,.82);
+      border-bottom:1px solid rgba(214,176,74,.18);
+      backdrop-filter: blur(12px);
+    }
+    .nav-wrap{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:12px 0;gap:16px;
+    }
+    .brand{
+      display:flex;align-items:center;gap:10px;
+      text-decoration:none;color:var(--text);
+    }
+    .brand img{
+      height:42px;width:auto;
+      filter:drop-shadow(0 0 12px rgba(214,176,74,.18));
+    }
+    .brand span{
+      font-size:.78rem;
+      color:rgba(255,247,221,.70);
+      letter-spacing:2px;
+      text-transform:uppercase;
+      font-weight:700;
+    }
+    .nav-links{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+    .nav-links a{
+      color:rgba(255,247,221,.90);
+      text-decoration:none;
+      font-size:.85rem;
+      font-weight:900;
+      letter-spacing:1.4px;
+      text-transform:uppercase;
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid transparent;
+      transition:.2s;
+    }
+    .nav-links a:hover{
+      border-color:rgba(214,176,74,.28);
+      background:rgba(214,176,74,.08);
+      color:var(--gold-soft);
+    }
+
+    /* ===== HERO ===== */
+    .hero{
+      padding:140px 0 90px;
+      border-bottom:2px solid rgba(214,176,74,.22);
+      position:relative;
+      overflow:hidden;
+      background:
+        radial-gradient(circle at 50% 35%, rgba(214,176,74,.10), transparent 62%),
+        linear-gradient(180deg, rgba(7,6,6,1), rgba(12,10,8,1));
+    }
+    .hero-inner{text-align:center;position:relative;z-index:1}
+    .hero-logo{
+      max-width:150px;width:100%;height:auto;
+      filter:drop-shadow(0 0 16px rgba(214,176,74,.22));
+    }
+    .hero-title{
+      font-family:'Cinzel Decorative',serif;
+      font-size:3.1rem;
+      font-weight:900;
+      text-transform:uppercase;
+      letter-spacing:10px;
+      margin-top:14px;
+    }
+    .hero-subtitle{
+      margin-top:12px;
+      color:rgba(255,247,221,.70);
+      letter-spacing:5px;
+      text-transform:uppercase;
+      font-size:.95rem;
+    }
+    .hero-btn{
+      display:inline-block;
+      margin-top:22px;
+      padding:12px 18px;
+      border-radius:14px;
+      border:1px solid rgba(214,176,74,.70);
+      background:rgba(214,176,74,.08);
+      color:var(--gold-soft);
+      text-decoration:none;
+      font-weight:900;
+      letter-spacing:2px;
+      text-transform:uppercase;
+      transition:.2s;
+    }
+    .hero-btn:hover{
+      transform:translateY(-2px);
+      background:rgba(214,176,74,.12);
+      border-color:rgba(242,220,154,.85);
+    }
+
+    /* ===== SECTION ===== */
+    .section{padding:90px 0}
+    .section-title{
+      text-align:center;
+      font-family:'Cinzel Decorative',serif;
+      font-size:2.15rem;
+      letter-spacing:5px;
+      text-transform:uppercase;
+      margin-bottom:14px;
+    }
+    .title-underline{
+      width:120px;height:3px;
+      margin:0 auto 34px;
+      background:linear-gradient(90deg, transparent, rgba(214,176,74,.95), transparent);
+    }
+
+    /* ===== TABS ===== */
+    .tabs{
+      display:flex;gap:10px;flex-wrap:wrap;justify-content:center;
+      margin-bottom:26px;
+    }
+    .tab-btn{
+      border:1px solid rgba(214,176,74,.24);
+      background:rgba(255,255,255,.02);
+      color:rgba(255,247,221,.92);
+      padding:10px 14px;
+      border-radius:999px;
+      cursor:pointer;
+      font-weight:900;
+      letter-spacing:1px;
+      text-transform:uppercase;
+      transition:.2s;
+    }
+    .tab-btn:hover{
+      border-color:rgba(214,176,74,.42);
+      background:rgba(214,176,74,.08);
+      color:var(--gold-soft);
+      transform:translateY(-1px);
+    }
+    .tab-btn.active{
+      border-color:rgba(242,220,154,.65);
+      background:linear-gradient(180deg, rgba(214,176,74,.16), rgba(214,176,74,.06));
+      color:var(--gold-soft);
+      box-shadow:0 0 0 2px rgba(214,176,74,.10) inset;
+    }
+    .tab-panel{display:none}
+    .tab-panel.active{display:block}
+
+    /* ===== CARDS ===== */
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+      gap:18px;
+    }
+    .card{
+      background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01));
+      border:1px solid rgba(214,176,74,.18);
+      border-top:2px solid rgba(214,176,74,.38);
+      border-radius:16px;
+      padding:18px;
+      box-shadow:var(--shadow);
+      transition:.2s;
+    }
+    .card:hover{
+      transform:translateY(-3px);
+      border-color:rgba(214,176,74,.28);
+    }
+    .tag{
+      display:inline-block;
+      font-size:11px;
+      letter-spacing:2px;
+      text-transform:uppercase;
+      color:var(--gold-soft);
+      background:rgba(214,176,74,.10);
+      padding:5px 10px;
+      border-radius:999px;
+      border:1px solid rgba(214,176,74,.22);
+      margin-bottom:10px;
+      font-weight:900;
+    }
+    .card h3{
+      font-size:1.22rem;
+      text-transform:uppercase;
+      letter-spacing:1px;
+      margin-bottom:6px;
+      font-weight:900;
+    }
+    .muted{color:var(--muted)}
+
+    /* ===== BILDER (Karte + Ingame) ===== */
+    .media{
+      margin-top:14px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+    .media-item{
+      border-radius:14px;
+      border:1px solid rgba(214,176,74,.55);
+      overflow:hidden;
+      box-shadow:0 10px 30px rgba(0,0,0,.50);
+      background:rgba(0,0,0,.18);
+    }
+    .media-label{
+      padding:10px 12px;
+      font-weight:900;
+      letter-spacing:2px;
+      text-transform:uppercase;
+      font-size:.8rem;
+      color:var(--text);
+      background:
+        linear-gradient(90deg, rgba(214,176,74,.20), rgba(214,176,74,.04));
+      border-bottom:1px solid rgba(214,176,74,.18);
+    }
+    .media-item img{
+      width:100%;
+      height:340px;        /* groß & gleich */
+      object-fit:cover;
+      display:block;
+      background:rgba(0,0,0,.12);
+    }
+
+    .meta{
+      margin-top:12px;
+      padding-top:12px;
+      border-top:1px solid rgba(214,176,74,.18);
+      display:grid;
+      gap:6px;
+      color:rgba(255,247,221,.72);
+      font-size:.9rem;
+    }
+
+    /* Mobile */
+    @media (max-width:720px){
+      .hero-title{font-size:2.2rem;letter-spacing:6px}
+      .media-item img{height:250px}
+      .audio-player{left:12px;right:12px}
+      .nav-links{display:none}
+      .tab-btn{width:100%;border-radius:12px}
+    }
+  </style>
+</head>
+
+<body class="intro-active">
+
+  <!-- INTRO -->
+  <div class="intro-overlay" id="introOverlay" aria-hidden="false">
+    <div class="intro-content">
+      <img class="intro-logo-image" src="logo.png" alt="Logo" />
+      <p class="intro-subtitle">Valerio</p>
+      <div class="intro-divider"></div>
+      <p class="intro-text">Routen Übersicht</p>
+
+      <button class="intro-button" id="enterButton" type="button">
+        <span>Öffnen</span>
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M7 3L14 10L7 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- AUDIO -->
+  <div class="audio-player" id="audioPlayer" aria-label="Audio Player">
+    <audio id="backgroundMusic" loop preload="auto">
+      <source src="valerio v4.mp3" type="audio/mpeg" />
+    </audio>
+
+    <div class="audio-player-content">
+      <button class="audio-control-btn" id="playPauseBtn" type="button" aria-label="Play/Pause">
+        <svg id="playIcon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M6.5 4.5l9 5.5-9 5.5V4.5z"/>
+        </svg>
+        <svg id="pauseIcon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor" style="display:none">
+          <path d="M5.5 3.5h3v13h-3V3.5zm6 0h3v13h-3V3.5z"/>
+        </svg>
+      </button>
+
+      <div class="audio-title">Musik</div>
+
+      <svg class="volume-icon" width="18" height="18" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+        <path d="M4 7h3.5l5.5-5.5v17L7.5 13H4V7z"/>
+      </svg>
+      <input type="range" id="volumeSlider" min="0" max="100" value="50" class="volume-slider" aria-label="Volume" />
+    </div>
+  </div>
+
+  <!-- NAVBAR -->
+  <header class="navbar">
+    <div class="container">
+      <div class="nav-wrap">
+        <a class="brand" href="#home">
+          <img src="logo.png" alt="Logo" />
+          <span>Routen LNV</span>
+        </a>
+        <nav class="nav-links" aria-label="Navigation">
+          <a href="#home">Start</a>
+          <a href="#routen">Routen</a>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section id="home" class="hero">
+    <div class="container hero-inner">
+      <img class="hero-logo" src="logo.png" alt="Logo" />
+      <h1 class="hero-title">Routen</h1>
+      <p class="hero-subtitle">Sammler · Labor · Verkäufer · Spots</p>
+      <a class="hero-btn" href="#routen">Enter</a>
+    </div>
+  </section>
+
+  <!-- ROUTEN -->
+  <section id="routen" class="section">
+    <div class="container">
+      <h2 class="section-title">Routen Übersicht</h2>
+      <div class="title-underline"></div>
+
+      <div class="tabs" role="tablist" aria-label="Routen Tabs">
+        <button class="tab-btn active" data-tab="tab-heroin"  role="tab" aria-selected="true">Heroin</button>
+        <button class="tab-btn" data-tab="tab-codein"  role="tab" aria-selected="false">Codein</button>
+ 	<button class="tab-btn" data-tab="tab-eisen"  role="tab" aria-selected="false">Eisen</button>
+	<button class="tab-btn" data-tab="tab-aluminium"  role="tab" aria-selected="false">Aluminium</button>
+   	 <button class="tab-btn" data-tab="tab-stahl"  role="tab" aria-selected="false">Stahl</button>
+        <button class="tab-btn" data-tab="tab-westen"  role="tab" aria-selected="false">Westen</button>
+        <button class="tab-btn" data-tab="tab-mehl"    role="tab" aria-selected="false">Mehl</button>
+        <button class="tab-btn" data-tab="tab-geldwäsche" role="tab" aria-selected="false">Geldwäsche</button>
+      </div>
+
+     <!-- HEROIN -->
+      <div class="tab-panel active" id="tab-heroin" role="tabpanel">
+        <div class="grid">
+          <article class="card">
+            <div class="tag">Heroin</div>
+            <h3>Sammler</h3>
+            <p class="muted">Karte + Ingame Ansicht.</p>
+            <div class="media">
+              <div class="media-item">
+                <div class="media-label">Karte</div>
+                <img src="Heroin Sammler Karte.png" alt="Heroin Sammler Karte">
+              </div>
+              <div class="media-item">
+                <div class="media-label">Ingame</div>
+                <img src="Heroin Sammler Ingame.png" alt="Heroin Sammler Ingame">
+              </div>
+            </div>
+            <div class="meta"><div><b>Ort:</b> Platzhalter</div></div>
+          </article>
+
+          <article class="card">
+            <div class="tag">Heroin</div>
+            <h3>Labor</h3>
+            <p class="muted">Karte + Ingame Ansicht.</p>
+            <div class="media">
+              <div class="media-item"><div class="media-label">Karte</div><img src="Heroin Labor Karte.png" alt="Heroin Labor Karte"></div>
+              <div class="media-item"><div class="media-label">Ingame</div><img src="Heroin Labor Ingame.png" alt="Heroin Labor Ingame"></div>
+            </div>
+            <div class="meta"><div><b>Interaktion:</b> Platzhalter</div></div>
+          </article>
+
+          <article class="card">
+            <div class="tag">Heroin</div>
+            <h3>Verkäufer</h3>
+            <p class="muted">Karte + Ingame Ansicht.</p>
+            <div class="media">
+              <div class="media-item"><div class="media-label">Karte</div><img src="Heroin Verkauf Karte.png" alt="Heroin Verkäufer Karte"></div>
+              <div class="media-item"><div class="media-label">Ingame</div><img src="Heroin Verkauf Ingame.png" alt="Heroin Verkäufer Ingame"></div>
+            </div>
+            <div class="meta"><div><b>Preis/Limit:</b> Platzhalter</div></div>
+          </article>
+        </div>
+      </div>
+
+      <!-- CODEIN -->
+      <div class="tab-panel" id="tab-codein" role="tabpanel">
+        <div class="grid">
+          <article class="card"><div class="tag">Codein</div><h3>Sammler</h3><p class="muted">Karte + Ingame.</p>
+            <div class="media">
+              <div class="media-item"><div class="media-label">Karte</div><img src="Codein Sammler Karte.png" alt=""></div>
+              <div class="media-item"><div class="media-label">Ingame</div><img src="Codein Sammler Ingame.png" alt=""></div>
+            </div>
+          </article>
+          <article class="card"><div class="tag">Codein</div><h3>Labor</h3><p class="muted">Karte + Ingame.</p>
+            <div class="media">
+              <div class="media-item"><div class="media-label">Karte</div><img src="Codein Labor Karte.png" alt=""></div>
+              <div class="media-item"><div class="media-label">Ingame</div><img src="Codein Labor Ingame.png" alt=""></div>
+            </div>
+          </article>
+          <article class="card"><div class="tag">Codein</div><h3>Verkäufer</h3><p class="muted">Karte + Ingame.</p>
+            <div class="media">
+              <div class="media-item"><div class="media-label">Karte</div><img src="Codein Verkauf Karte.png" alt=""></div>
+              <div class="media-item"><div class="media-label">Ingame</div><img src="Codein Verkauf Ingame.png" alt=""></div>
+            </div>
+          </article>
+        </div>
+      </div>
+
+   <!-- Aluminium -->
+      <div class="tab-panel" id="tab-aluminium" role="tabpanel">
+        <div class="grid">
+          <article class="card"><div class="tag">Aluminium</div><h3>Sammler</h3><p class="muted">Karte + Ingame.</p>
+            <div class="media">
+              <div class="media-item"><div class="media-label">Karte</div><img src="Aluminium Sammler Karte.png" alt=""></div>
+              <div class="media-item"><div class="media-label">Ingame</div><img src="Aluminium Sammler Ingame.png" alt=""></div>
+            </div>
+          </article>
+          <article class="card"><div class="tag">Aluminium</div><h3>Verarbeiter</h3><p class="muted">Karte + Ingame.</p>
+            <div class="media">
+              <div class="media-item"><div class="media-label">Karte</div><img src="Aluminium Labor Karte.png" alt=""></div>
+              <div class="media-item"><div class="media-label">Ingame</div><img src="Aluminium Labor Ingame.png" alt=""></div>
+            </div>
+          </article>
+          <article class="card"><div class="tag">Aluminium</div><h3>Verkäufer</h3><p class="muted">Karte + Ingame.</p>
+            <div class="media">
+              <div class="media-item"><div class="media-label">Karte</div><img src="Aluminium Verkaufer Karte.png" alt=""></div>
+              <div class="media-item"><div class="media-label">Ingame</div><img src="Aluminium Verkaufer Ingame.png" alt=""></div>
+            </div>
+          </article>
+        </div>
+      </div>
+
+
+      <!-- WESTEN -->
+      <div class="tab-panel" id="tab-westen" role="tabpanel">
+        <div class="grid">
+          <article class="card"><div class="tag">Westen</div><h3>Stoff Sammler</h3><p class="muted">Karte + Ingame.</p>
+            <div class="media">
+              <div class="media-item"><div class="media-label">Karte</div><img src="Stoff Sammler Karte.png" alt=""></div>
+              <div class="media-item"><div class="media-label">Ingame</div><img src="Stoff Sammler Ingame.png" alt=""></div>
+            </div>
+          </article>
+          <article class="card"><div class="tag">Westen</div><h3>Verarbeitung</h3><p class="muted">Karte + Ingame.</p>
+            <div class="media">
+              <div class="media-item"><div class="media-label">Karte</div><img src="Westen Hersteller Karte.png" alt=""></div>
+              <div class="media-item"><div class="media-label">Ingame</div><img src="Westen Hersteller Ingame.png" alt=""></div>
+            </div>
+          </article>
+        </div>
+      </div>
+
+      <!-- MEHL -->
+      <div class="tab-panel" id="tab-mehl" role="tabpanel">
+        <div class="grid">
+          <article class="card"><div class="tag">Mehl</div><h3>Sammler</h3><p class="muted">Karte + Ingame.</p>
+            <div class="media">
+              <div class="media-item"><div class="media-label">Karte</div><img src="Mehl Sammler Karte.png" alt=""></div>
+            </div>
+          </article>
+	 <article class="card"><div class="tag">Westen</div><h3>Sammler</h3><p class="muted">Karte + Ingame.</p>
+ 	  <div class="media">
+         <div class="media-item"><div class="media-label">Ingame</div><img src="Mehl Sammler Ingame.png" alt=""></div>
+         </div>
+          </article>
+        </div>
+      </div>
+
+
+      <!-- Geldwäsche -->
+      <div class="tab-panel" id="tab-geldwäsche" role="tabpanel">
+        <div class="grid">
+          <article class="card"><div class="tag">Schwarzgeld</div><h3>Ort</h3><p class="muted">Karte + Ingame.</p>
+            <div class="media">
+              <div class="media-item"><div class="media-label">Karte</div><img src="Geldwäsche Karte.png" alt=""></div>
+             </div>
+          </article>
+ 	<article class="card"><div class="tag">Schwarzgeld</div><h3>Geldwäsche</h3><p class="muted">Karte + Ingame.</p>
+ 	<div class="media">
+ 	<div class="media-item"><div class="media-label">Ingame</div><img src="Geldwäsche Ingame.png" alt=""></div>
+ 	 </div>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    // Tabs
+    const tabButtons = Array.from(document.querySelectorAll(".tab-btn"));
+    const tabPanels  = Array.from(document.querySelectorAll(".tab-panel"));
+    function openTab(id){
+      tabButtons.forEach(b=>{
+        const on = (b.dataset.tab === id);
+        b.classList.toggle("active", on);
+        b.setAttribute("aria-selected", on ? "true" : "false");
+      });
+      tabPanels.forEach(p=>p.classList.toggle("active", p.id === id));
+    }
+    tabButtons.forEach(btn => btn.addEventListener("click", ()=>openTab(btn.dataset.tab)));
+    openTab("tab-heroin");
+
+    // Intro + Audio
+    const introOverlay = document.getElementById("introOverlay");
+    const enterButton  = document.getElementById("enterButton");
+    const audioPlayer  = document.getElementById("audioPlayer");
+    const music        = document.getElementById("backgroundMusic");
+    const playPauseBtn = document.getElementById("playPauseBtn");
+    const playIcon     = document.getElementById("playIcon");
+    const pauseIcon    = document.getElementById("pauseIcon");
+    const volumeSlider = document.getElementById("volumeSlider");
+
+    enterButton.addEventListener("click", () => {
+      introOverlay.classList.add("hidden");
+      document.body.classList.remove("intro-active");
+      audioPlayer.classList.add("visible");
+    });
+
+    function setPlayingUI(isPlaying){
+      playIcon.style.display  = isPlaying ? "none" : "block";
+      pauseIcon.style.display = isPlaying ? "block" : "none";
+    }
+    playPauseBtn.addEventListener("click", async () => {
+      try{
+        if(music.paused){
+          await music.play();
+          setPlayingUI(true);
+        }else{
+          music.pause();
+          setPlayingUI(false);
+        }
+      }catch(e){
+        setPlayingUI(false);
+      }
+    });
+
+    volumeSlider.addEventListener("input", () => {
+      music.volume = Math.max(0, Math.min(1, volumeSlider.value / 100));
+    });
+    music.volume = volumeSlider.value / 100;
+  </script>
+</body>
+</html>
